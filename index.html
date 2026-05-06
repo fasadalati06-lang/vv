@@ -4,12 +4,10 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>أداة توليد الكلمات</title>
 <style>
-:root { --bg: #f4f7f6; --box: #fff; --txt: #333; --brd: #ccc; --btn: #007bff; --btn-h: #0056b3; --inp: #f9f9f9; }
-body.dark { --bg: #121212; --box: #1e1e1e; --txt: #f4f4f4; --brd: #444; --btn: #0d6efd; --btn-h: #0b5ed7; --inp: #2a2a2a; }
-* { box-sizing: border-box; transition: background 0.3s, color 0.3s; }
+:root { --bg: #121212; --box: #1e1e1e; --txt: #f4f4f4; --brd: #444; --btn: #0d6efd; --btn-h: #0b5ed7; --inp: #2a2a2a; }
+* { box-sizing: border-box; }
 body { font-family: system-ui, sans-serif; background: var(--bg); color: var(--txt); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 15px; }
-.box { background: var(--box); padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; position: relative; }
-.theme-btn { position: absolute; top: 15px; left: 15px; background: none; border: none; font-size: 22px; cursor: pointer; padding: 0; }
+.box { background: var(--box); padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); width: 100%; max-width: 400px; text-align: center; }
 h2 { margin: 0 0 15px; font-size: 1.5rem; }
 button.btn { background: var(--btn); color: #fff; border: none; padding: 12px; font-size: 16px; border-radius: 8px; cursor: pointer; width: 100%; margin-bottom: 10px; }
 button.btn:hover { background: var(--btn-h); }
@@ -23,9 +21,8 @@ input[type="text"] { width: 100%; padding: 12px; margin-bottom: 10px; border: 1p
 </head>
 <body>
 <div class="box">
-<button class="theme-btn" id="theme">🌙</button>
 <h2>توليد 12 كلمة</h2>
-<div id="stat" style="color:#007bff">جاري التحميل...</div>
+<div id="stat" style="color:var(--btn)">جاري التحميل...</div>
 <button id="gen" class="btn" disabled>توليد الكلمات</button>
 <div class="res" id="resBox">
 <input type="text" id="txt" readonly>
@@ -33,9 +30,8 @@ input[type="text"] { width: 100%; padding: 12px; margin-bottom: 10px; border: 1p
 </div>
 </div>
 <script>
-let w=[];const q=s=>document.querySelector(s),st=q('#stat'),gb=q('#gen'),rb=q('#resBox'),tx=q('#txt'),cb=q('#copy'),th=q('#theme');
-th.onclick=()=>{document.body.classList.toggle('dark');th.innerText=document.body.classList.contains('dark')?'☀️':'🌙'};
-fetch('word.txt').then(r=>r.ok?r.text():Promise.reject()).then(t=>{w=t.split(/\r?\n/).map(l=>l.trim()).filter(l=>l);if(w.length<12)st.innerHTML='<span style="color:red">الملف ينقصه كلمات</span>';else{st.innerHTML='<span style="color:#28a745">جاهز ✔</span>';gb.disabled=!1;}}).catch(()=>st.innerHTML='<span style="color:red">حدث خطأ بالملف</span>');
+let w=[];const q=s=>document.querySelector(s),st=q('#stat'),gb=q('#gen'),rb=q('#resBox'),tx=q('#txt'),cb=q('#copy');
+fetch('word.txt').then(r=>r.ok?r.text():Promise.reject()).then(t=>{w=t.split(/\r?\n/).map(l=>l.trim()).filter(l=>l);if(w.length<12)st.innerHTML='<span style="color:#ff4c4c">الملف ينقصه كلمات</span>';else{st.innerHTML='<span style="color:#20c997">جاهز ✔</span>';gb.disabled=!1;}}).catch(()=>st.innerHTML='<span style="color:#ff4c4c">حدث خطأ بالملف</span>');
 gb.onclick=()=>{let s=[];while(s.length<12){let r=w[Math.floor(Math.random()*w.length)];if(!s.includes(r))s.push(r)}tx.value=s.join(' ');rb.style.display='block';cb.innerText='نسخ';cb.style.background='#28a745'};
 cb.onclick=()=>{navigator.clipboard.writeText(tx.value).then(()=>{cb.innerText='تم النسخ ✔';cb.style.background='#20c997';setTimeout(()=>{cb.innerText='نسخ';cb.style.background='#28a745'},2e3)})};
 </script>

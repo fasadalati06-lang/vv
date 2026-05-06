@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>توليد 12 كلمة</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+        h2 { color: #333; margin-bottom: 10px; }
+        p { color: #666; margin-bottom: 25px; font-size: 14px; }
+        
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        button:hover { background-color: #0056b3; }
+        button:disabled { background-color: #aaa; cursor: not-allowed; }
+        
+        .result-section {
+            display: none; /* مخفي حتى يتم التوليد */
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            text-align: left;
+            direction: ltr;
+            box-sizing: border-box;
+            background-color: #f9f9f9;
+        }
+
+        #copyBtn {
+            background-color: #28a745;
+        }
+        #copyBtn:hover { background-color: #218838; }
+
+        #status {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>أداة توليد 12 كلمة</h2>
+        <p>يتم قراءة الكلمات تلقائياً من ملف <b>word.txt</b> الموجود في نفس المجلد.</p>
+
+        <div id="status"><span style="color:blue;">جاري تحميل الكلمات من الملف...</span></div>
+
+        <button id="generateBtn" disabled>توليد 12 كلمة</button>
+
+        <div class="result-section" id="resultSection">
+            <input type="text" id="resultText" readonly>
+            <button id="copyBtn">نسخ الكلمات</button>
+        </div>
+    </div>
+
+    <script>
+        let wordsArray = []; 
+        const statusDiv = document.getElementById('status');
+        const generateBtn = document.getElementById('generateBtn');
+        const resultSection = document.getElementById('resultSection');
+        const resultText = document.getElementById('resultText');
+        const copyBtn = document.getElementById('copyBtn');
+
+        // قراءة ملف word.txt تلقائياً عند فتح الصفحة
+        window.onload = function() {
+            fetch('word.txt')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('لم يتم العثور على الملف');
+                    }
+                    return response.text();
+                })
+                .then(text => {
+                    // تنظيف النص وتخزينه في المصفوفة
+                    wordsArray = text.split(/\r?\n/).map(line => line.trim()).filter(line => line.length > 0);
+
+                    if (wordsArray.length < 12) {
+                        statusDiv.innerHTML = "<span style='color:red;'>خطأ: ملف word.txt يجب أن يحتوي على 12 كلمة على الأقل!</span>";
+                    } else {
+                        statusDiv.innerHTML = `<span style='color:green;'>تم تحميل ${wordsArray.length} كلمة بنجاح ✔</span>`;
+                        generateBtn.disabled = false; // تفعيل زر التوليد
+                    }
+                })
+                .catch(error => {
+                    statusDiv.innerHTML = `<span style='color:red;'>خطأ: لا يمكن قراءة ملف word.txt. يرجى التأكد من تشغيل الصفحة عبر خادم محلي (Localhost).</span>`;
+                    console.error('Error loading file:', error);
+                });
+        };
+
+        // توليد الكلمات عند الضغط على الزر
+        generateBtn.addEventListener('click', function() {
+            let selectedWords = [];
+            
+            // اختيار 12 كلمة عشوائية بدون تكرار
+            while (selectedWords.length < 12) {
+                let randomIndex = Math.floor(Math.random() * wordsArray.length);
+                let word = wordsArray[randomIndex];
+                if (!selectedWords.includes(word)) {
+                    selectedWords.push(word);
+                }
+            }
+
+            // عرض النتيجة
+            resultText.value = selectedWords.join(' ');
+            resultSection.style.display = 'block'; 
+            
+            // إعادة ضبط زر النسخ
+            copyBtn.innerText = 'نسخ الكلمات';
+            copyBtn.style.backgroundColor = '#28a745';
+        });
+
+        // نسخ النص إلى الحافظة
+        copyBtn.addEventListener('click', function() {
+            navigator.clipboard.writeText(resultText.value).then(() => {
+                copyBtn.innerText = 'تم النسخ بنجاح! ✔';
+                copyBtn.style.backgroundColor = '#20c997'; 
+                
+                setTimeout(() => {
+                    copyBtn.innerText = 'نسخ الكلمات';
+                    copyBtn.style.backgroundColor = '#28a745';
+                }, 2000);
+            }).catch(err => {
+                alert('فشل النسخ، يرجى النسخ يدوياً.');
+            });
+        });
+    </script>
+
+</body>
+</html>
